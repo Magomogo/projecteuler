@@ -18,13 +18,8 @@ var num = 600851475143,
         return current;
     };
 
-var prime = 32556691, skipProgress = 0;
+var prime = 3, limit = Math.sqrt(num);
 do {
-
-    if (skipProgress-- <= 0) {
-        skipProgress = 10000;
-        console.log(prime);
-    }
 
     prime = nextPrime(prime);
 
@@ -32,4 +27,4 @@ do {
         console.log('Found: ', prime)
     }
 
-} while (prime < 600851475143);
+} while (prime < limit);
