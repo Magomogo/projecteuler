@@ -21,18 +21,12 @@ var assert = require ('assert'),
         [20, 73, 35, 29, 78, 31, 90,  1, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57,  5, 54],
         [ 1, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52,  1, 89, 19, 67, 48],
     ],
-    copy = function (obj) {
-        return JSON.parse(JSON.stringify(obj));
-    },
-    num = function (pos) {
-        return world[pos.y][pos.x];
-    },
     subSet = function (fn, pos) {
-        var newPos = copy(pos), subset = [];
-        for (var i = 0; i < 4; i++) {
-            subset.push(num(newPos));
-            newPos = fn(newPos);
-            if (newPos.x < 0 || newPos.x > 19 || newPos.y < 0 || newPos.y > 19) {
+        var subset = [];
+        while (subset.length < 4) {
+            subset.push(world[pos.y][pos.x]);
+            pos = fn(pos);
+            if (pos.x < 0 || pos.x > 19 || pos.y < 0 || pos.y > 19) {
                 return [];
             }
         }
@@ -40,10 +34,10 @@ var assert = require ('assert'),
     },
     down = function (pos) { pos.y++; return pos; },
     up = function (pos) { pos.y--; return pos; },
-    right = function (pos) { pos.x = pos.x + 1; return pos; },
-    left = function (pos) { pos.x = pos.x - 1; return pos;},
+    right = function (pos) { pos.x++; return pos; },
+    left = function (pos) { pos.x--; return pos;},
     both = function (f1, f2) { return function (p) { return f1(f2(p));};},
-    product = function (memo, num) { return memo * num},
+    product = function (memo, num) { return memo * num; },
     result = 0;
 
 assert.deepEqual(subSet (down, {x: 0, y: 0}), [8, 49, 81, 52]);
@@ -59,10 +53,11 @@ assert.deepEqual(subSet (both(right, down), {x: 8, y: 6}).reduce(product, 1), 17
 
 for (var x = 0; x < 20; x++) {
     for (var y = 0; y < 20; y++) {
-        [right, left, down, up, both(right, down), both(right, up), both(left, down), both(left, up)].forEach(function (dirFn) {
-            result = Math.max(result, subSet (dirFn, {x: x, y: y}).reduce(product, 1));
-        });
+        [right, left, down, up, both(right, down), both(right, up), both(left, down), both(left, up)]
+            .forEach(function (dirFn) {
+                result = Math.max(result, subSet (dirFn, {x: x, y: y}).reduce(product, 1));
+            });
     }
 }
 
-console.log(result);
+console.log(result === 70600674);
